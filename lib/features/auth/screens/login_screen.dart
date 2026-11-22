@@ -42,11 +42,16 @@ class _LoginScreenState extends State<LoginScreen> {
       final input = _identifierController.text.trim();
       String emailToUse = input;
 
-      // Jika user menginput nomor HP/WA, kita query email dari tabel pengguna
+      // Jika user menginput nomor HP/WA (bukan email)
       if (!input.contains('@')) {
-        final profile = await authService.getProfile();
-        if (profile != null && profile['email'] != null) {
-          emailToUse = profile['email'];
+        final foundEmail = await authService.findEmailByPhone(input);
+        if (foundEmail != null && foundEmail.isNotEmpty) {
+          emailToUse = foundEmail;
+        } else {
+          throw Exception(
+            'Nomor telepon belum terhubung dengan akun email di database. '
+            'Pastikan nomor sudah terdaftar atau gunakan email untuk masuk.',
+          );
         }
       }
 

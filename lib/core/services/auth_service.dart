@@ -8,6 +8,47 @@ class AuthService {
   bool get isAuthenticated => currentUser != null;
   Stream<AuthState> get authStateChanges => _client.auth.onAuthStateChange;
 
+  /// Mencari email berdasarkan nomor HP/WA untuk mendukung login dengan nomor telepon
+  Future<String?> findEmailByPhone(String phone) async {
+    final clean = phone.trim();
+    if (clean.isEmpty) return null;
+
+    // 1. Coba lewat RPC function jika backend menyediakannya di database
+    try {
+      final res = await _client.rpc('get_email_by_phone', params: {'phone_input': clean});
+      if (res != null && res.toString().isNotEmpty) {
+        return res.toString();
+      }
+    } catch (_) {}
+
+    // 2. Coba query ke tabel 'pengguna' dengan variasi format (08xxx, 628xxx, +628xxx)
+    try {
+      final digits = clean.replaceAll(RegExp(r'\D'), '');
+      final withZero = digits.startsWith('62')
+          ? '0${digits.substring(2)}'
+          : (digits.startsWith('0') ? digits : '0$digits');
+      final with62 = digits.startsWith('0')
+          ? '62${digits.substring(1)}'
+          : (digits.startsWith('62') ? digits : '62$digits');
+      final withPlus62 = '+$with62';
+
+      final res = await _client
+          .from('pengguna')
+          .select('email')
+          .or('no_hp.eq.$clean,no_hp.eq.$digits,no_hp.eq.$withZero,no_hp.eq.$with62,no_hp.eq.$withPlus62')
+          .limit(1)
+          .maybeSingle();
+
+      if (res != null && res['email'] != null) {
+        return res['email'].toString();
+      }
+    } catch (e) {
+      // Permission denied jika belum di-GRANT SELECT oleh backend
+    }
+
+    return null;
+  }
+
   /// Registrasi akun baru & sinkronisasi data ke tabel 'pengguna'
   Future<AuthResponse> signUp({
     required String email,
@@ -35,14 +76,13 @@ class AuthService {
           'nama_lengkap': namaLengkap.trim(),
           'email': email.trim(),
           'no_hp': noHp.trim(),
-          'role_id': roleId ?? 1, // Default role misal: Pasien (1)
+          'role_id': roleId ?? 1, // Default role misal: Pasien / Wali (1)
           'status': 'aktif',
           'created_at': DateTime.now().toIso8601String(),
           'updated_at': DateTime.now().toIso8601String(),
         });
       } catch (e) {
         // Jika tabel memiliki RLS atau trigger otomatis di Supabase, jangan gagalkan registrasi
-        // Catat error untuk debugging
       }
     }
 

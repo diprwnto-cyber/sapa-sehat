@@ -1,3 +1,4 @@
+import 'package:google_fonts/google_fonts.dart';
 import 'package:material_ui/material_ui.dart';
 import 'core/constants/app_colors.dart';
 import 'core/services/supabase_service.dart';
@@ -19,13 +20,14 @@ class SapaSehatApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
+        fontFamily: GoogleFonts.poppins().fontFamily,
+        textTheme: GoogleFonts.poppinsTextTheme(),
         colorScheme: ColorScheme.fromSeed(
           seedColor: AppColors.primary,
           primary: AppColors.primary,
           surface: Colors.white,
         ),
         scaffoldBackgroundColor: Colors.white,
-        fontFamily: null,
       ),
       home: const SplashScreen(),
     );

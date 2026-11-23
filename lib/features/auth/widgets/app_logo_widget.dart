@@ -5,7 +5,7 @@ class AppLogoWidget extends StatelessWidget {
 
   const AppLogoWidget({
     super.key,
-    this.size = 110,
+    this.size = 120,
   });
 
   @override
@@ -13,7 +13,6 @@ class AppLogoWidget extends StatelessWidget {
     return Image.asset(
       'assets/images/logo.png',
       width: size,
-      height: size,
       fit: BoxFit.contain,
       errorBuilder: (context, error, stackTrace) => const Icon(
         Icons.local_hospital_rounded,

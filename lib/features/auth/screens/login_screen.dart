@@ -42,11 +42,16 @@ class _LoginScreenState extends State<LoginScreen> {
       final input = _identifierController.text.trim();
       String emailToUse = input;
 
-      // Jika user menginput nomor HP/WA, kita query email dari tabel pengguna
+      // Jika user menginput nomor HP/WA (bukan email)
       if (!input.contains('@')) {
-        final profile = await authService.getProfile();
-        if (profile != null && profile['email'] != null) {
-          emailToUse = profile['email'];
+        final foundEmail = await authService.findEmailByPhone(input);
+        if (foundEmail != null && foundEmail.isNotEmpty) {
+          emailToUse = foundEmail;
+        } else {
+          throw Exception(
+            'Nomor telepon belum terhubung dengan akun email di database. '
+            'Pastikan nomor sudah terdaftar atau gunakan email untuk masuk.',
+          );
         }
       }
 
@@ -89,6 +94,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.transparent,
       body: AuthBackground(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
@@ -98,8 +104,8 @@ class _LoginScreenState extends State<LoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const SizedBox(height: 16),
-                // Official Logo
-                const AppLogoWidget(size: 110),
+                // Official Transparent Logo
+                const AppLogoWidget(size: 135),
                 const SizedBox(height: 16),
 
                 // Title & Subtitle matching Figma

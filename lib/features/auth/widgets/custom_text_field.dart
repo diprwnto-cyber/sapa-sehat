@@ -5,24 +5,28 @@ class CustomTextField extends StatelessWidget {
   final TextEditingController controller;
   final String hintText;
   final String? labelText;
-  final Widget? prefix;
+  final Widget? prefixWidget;
   final IconData? prefixIcon;
   final Widget? suffixIcon;
   final bool obscureText;
   final TextInputType keyboardType;
   final String? Function(String?)? validator;
+  final AutovalidateMode autovalidateMode;
+  final void Function(String)? onChanged;
 
   const CustomTextField({
     super.key,
     required this.controller,
     required this.hintText,
     this.labelText,
-    this.prefix,
+    this.prefixWidget,
     this.prefixIcon,
     this.suffixIcon,
     this.obscureText = false,
     this.keyboardType = TextInputType.text,
     this.validator,
+    this.autovalidateMode = AutovalidateMode.disabled,
+    this.onChanged,
   });
 
   @override
@@ -46,6 +50,8 @@ class CustomTextField extends StatelessWidget {
           obscureText: obscureText,
           keyboardType: keyboardType,
           validator: validator,
+          autovalidateMode: autovalidateMode,
+          onChanged: onChanged,
           style: const TextStyle(
             fontSize: 14,
             color: AppColors.textPrimary,
@@ -60,10 +66,14 @@ class CustomTextField extends StatelessWidget {
             ),
             filled: true,
             fillColor: Colors.white,
-            prefix: prefix,
-            prefixIcon: prefixIcon != null
-                ? Icon(prefixIcon, color: AppColors.textSecondary, size: 19)
-                : null,
+            prefixIcon: prefixWidget ??
+                (prefixIcon != null
+                    ? Icon(prefixIcon, color: AppColors.textSecondary, size: 20)
+                    : null),
+            prefixIconConstraints: const BoxConstraints(
+              minWidth: 48,
+              minHeight: 48,
+            ),
             suffixIcon: suffixIcon,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 14,
@@ -83,11 +93,16 @@ class CustomTextField extends StatelessWidget {
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.error, width: 1.0),
+              borderSide: const BorderSide(color: AppColors.error, width: 1.2),
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.error, width: 1.5),
+              borderSide: const BorderSide(color: AppColors.error, width: 1.8),
+            ),
+            errorStyle: const TextStyle(
+              color: AppColors.error,
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ),

@@ -70,6 +70,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.transparent,
       body: AuthBackground(
         child: Column(
           children: [
@@ -201,17 +202,46 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         CustomTextField(
           controller: _phoneController,
           labelText: 'Nomor WhatsApp Terdaftar',
-          hintText: '0812-3456-7890',
+          hintText: '812-3456-7890',
           keyboardType: TextInputType.phone,
-          prefix: Container(
-            margin: const EdgeInsets.only(right: 8),
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: const Color(0xFFF1F5F9),
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: const Text('+62', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          prefixWidget: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(width: 14),
+              const Icon(
+                Icons.phone_iphone_rounded,
+                color: AppColors.textSecondary,
+                size: 20,
+              ),
+              const SizedBox(width: 8),
+              const Text(
+                '+62',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                width: 1,
+                height: 20,
+                color: AppColors.border,
+              ),
+              const SizedBox(width: 8),
+            ],
           ),
+          validator: (val) {
+            if (val == null || val.trim().isEmpty) {
+              return 'Nomor WhatsApp wajib diisi';
+            }
+            final digits = val.replaceAll(RegExp(r'\D'), '');
+            if (digits.length < 12) {
+              return 'nomor tidak boleh kurang dari 12';
+            }
+            return null;
+          },
         ),
         const SizedBox(height: 24),
 

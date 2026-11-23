@@ -89,6 +89,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.transparent,
       body: AuthBackground(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
@@ -98,8 +99,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const SizedBox(height: 12),
-                // Official Logo
-                const AppLogoWidget(size: 100),
+                // Official Transparent Logo
+                const AppLogoWidget(size: 120),
                 const SizedBox(height: 14),
 
                 // Title & Subtitle matching Figma

@@ -94,6 +94,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.transparent,
       body: AuthBackground(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
@@ -103,8 +104,8 @@ class _LoginScreenState extends State<LoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const SizedBox(height: 16),
-                // Official Logo
-                const AppLogoWidget(size: 110),
+                // Official Transparent Logo
+                const AppLogoWidget(size: 135),
                 const SizedBox(height: 16),
 
                 // Title & Subtitle matching Figma

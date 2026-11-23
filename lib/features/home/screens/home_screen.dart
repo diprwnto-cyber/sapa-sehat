@@ -12,22 +12,29 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   Map<String, dynamic>? _profile;
+  List<Map<String, dynamic>> _children = [];
   bool _isLoading = true;
   int _selectedTabIndex = 0; // Bottom nav index
   int _selectedChildIndex = 0; // Child tab index
 
+  bool get _hasChildren => _children.isNotEmpty;
+
   @override
   void initState() {
     super.initState();
-    _loadProfile();
+    _loadData();
   }
 
-  Future<void> _loadProfile() async {
+  Future<void> _loadData() async {
     try {
-      final profile = await authService.getProfile();
+      final results = await Future.wait([
+        authService.getProfile(),
+        authService.getChildren(),
+      ]);
       if (mounted) {
         setState(() {
-          _profile = profile;
+          _profile = results[0] as Map<String, dynamic>?;
+          _children = results[1] as List<Map<String, dynamic>>;
           _isLoading = false;
         });
       }
@@ -111,6 +118,220 @@ class _HomeScreenState extends State<HomeScreen> {
         (route) => false,
       );
     }
+  }
+
+  void _showAddChildDialog({bool isKlaim = false}) {
+    final nameController = TextEditingController(text: isKlaim ? '' : 'Muhammad Rayyan Al-Ghifari');
+    final nikController = TextEditingController(text: isKlaim ? '3201123456780001' : '');
+    final usiaController = TextEditingController(text: '14');
+    String jenisKelamin = 'Laki-laki';
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setModalState) => Padding(
+          padding: EdgeInsets.only(
+            left: 24,
+            right: 24,
+            top: 20,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    margin: const EdgeInsets.only(bottom: 16),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: isKlaim ? const Color(0xFFEFF6FF) : const Color(0xFFECFDF5),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        isKlaim ? Icons.link_rounded : Icons.child_care_rounded,
+                        color: isKlaim ? const Color(0xFF2563EB) : const Color(0xFF059669),
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        isKlaim ? 'Klaim Data Anak' : 'Daftarkan Anak Baru',
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF0F172A),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                // Form Fields
+                Text(
+                  isKlaim ? 'Nomor Induk Kependudukan (NIK) Anak / KIA' : 'Nama Lengkap Anak Balita',
+                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF475569)),
+                ),
+                const SizedBox(height: 6),
+                TextField(
+                  controller: isKlaim ? nikController : nameController,
+                  decoration: InputDecoration(
+                    hintText: isKlaim ? 'Contoh: 3201xxxxxxxxxxxx' : 'Contoh: Muhammad Rayyan',
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Color(0xFF059669), width: 1.5),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                if (!isKlaim) ...[
+                  const Text(
+                    'Usia Balita (Bulan)',
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF475569)),
+                  ),
+                  const SizedBox(height: 6),
+                  TextField(
+                    controller: usiaController,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      hintText: 'Contoh: 14',
+                      suffixText: 'Bulan',
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: Color(0xFF059669), width: 1.5),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  const Text(
+                    'Jenis Kelamin',
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF475569)),
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ChoiceChip(
+                          label: const Center(child: Text('Laki-laki')),
+                          selected: jenisKelamin == 'Laki-laki',
+                          selectedColor: const Color(0xFFECFDF5),
+                          labelStyle: TextStyle(
+                            color: jenisKelamin == 'Laki-laki' ? const Color(0xFF059669) : const Color(0xFF475569),
+                            fontWeight: FontWeight.bold,
+                          ),
+                          onSelected: (val) => setModalState(() => jenisKelamin = 'Laki-laki'),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: ChoiceChip(
+                          label: const Center(child: Text('Perempuan')),
+                          selected: jenisKelamin == 'Perempuan',
+                          selectedColor: const Color(0xFFECFDF5),
+                          labelStyle: TextStyle(
+                            color: jenisKelamin == 'Perempuan' ? const Color(0xFF059669) : const Color(0xFF475569),
+                            fontWeight: FontWeight.bold,
+                          ),
+                          onSelected: (val) => setModalState(() => jenisKelamin = 'Perempuan'),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                ],
+
+                // Submit Button
+                SizedBox(
+                  width: double.infinity,
+                  height: 46,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      final childName = isKlaim
+                          ? 'Muhammad Rayyan Al-Ghifari'
+                          : (nameController.text.trim().isEmpty ? 'Muhammad Rayyan Al-Ghifari' : nameController.text.trim());
+                      final age = int.tryParse(usiaController.text) ?? 14;
+
+                      final newChild = {
+                        'id': DateTime.now().millisecondsSinceEpoch.toString(),
+                        'nama_anak': childName,
+                        'usia_bulan': age,
+                        'jenis_kelamin': jenisKelamin,
+                        'berat_badan': '9.8',
+                        'tinggi_badan': '78.2',
+                        'lingkar_kepala': '46.5',
+                        'lingkar_lengan': '14.2',
+                        'kunjungan_terakhir': '10 Nov 2026',
+                        'kader': 'Ibu Siti Aminah',
+                        'status_verifikasi': 'terverifikasi',
+                      };
+
+                      setState(() {
+                        _children.add(newChild);
+                        _selectedChildIndex = _children.length - 1;
+                      });
+
+                      Navigator.pop(ctx);
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          backgroundColor: const Color(0xFF059669),
+                          content: Text(
+                            isKlaim
+                                ? 'Berhasil! Data anak berhasil diklaim dan diverifikasi.'
+                                : 'Berhasil! Data anak $childName berhasil didaftarkan.',
+                          ),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF059669),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      elevation: 0,
+                    ),
+                    child: Text(
+                      isKlaim ? 'Klaim Sekarang' : 'Daftarkan Sekarang',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   void _showFeatureNotice(String title, String description) {
@@ -589,309 +810,421 @@ class _HomeScreenState extends State<HomeScreen> {
                         const SizedBox(height: 12),
 
                         // ==========================================
-                        // 3. VERIFIED ACCOUNT BANNER
+                        // 3-5. CONDITIONAL: CHILD DATA or EMPTY STATE
                         // ==========================================
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFECFDF5), // soft emerald
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: const Color(0xFFA7F3D0),
-                              width: 1,
-                            ),
-                          ),
-                          child: Row(
-                            children: [
-                              const Icon(
-                                Icons.verified_user_outlined,
-                                color: Color(0xFF059669),
-                                size: 18,
+                        if (_hasChildren) ...[
+                          // --- VERIFIED ACCOUNT BANNER ---
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFECFDF5),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: const Color(0xFFA7F3D0),
+                                width: 1,
                               ),
-                              const SizedBox(width: 8),
-                              const Expanded(
-                                child: Text(
-                                  'Akun Terhubung: 1 Anak Balita Terverifikasi Resmi',
-                                  style: TextStyle(
-                                    fontSize: 11.5,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF065F46),
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(
+                                  Icons.verified_user_outlined,
+                                  color: Color(0xFF059669),
+                                  size: 18,
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    'Akun Terhubung: ${_children.length} Anak Balita Terverifikasi Resmi',
+                                    style: const TextStyle(
+                                      fontSize: 11.5,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF065F46),
+                                    ),
                                   ),
                                 ),
-                              ),
-                              InkWell(
-                                onTap: () {
-                                  _showFeatureNotice(
-                                    'Kelola Akun Anak',
-                                    'Akun Anda telah terhubung dan terverifikasi dengan data balita di database Posyandu.',
+                                InkWell(
+                                  onTap: () {
+                                    _showFeatureNotice(
+                                      'Kelola Akun Anak',
+                                      'Akun Anda telah terhubung dan terverifikasi dengan data balita di database Posyandu.',
+                                    );
+                                  },
+                                  child: const Text(
+                                    'Kelola ↗',
+                                    style: TextStyle(
+                                      fontSize: 11.5,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF059669),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          const SizedBox(height: 14),
+
+                          // --- CHILD TABS ---
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              children: [
+                                // Dynamic child tabs from database
+                                ..._children.asMap().entries.map((entry) {
+                                  final idx = entry.key;
+                                  final child = entry.value;
+                                  final namaAnak = child['nama_anak'] ?? 'Anak ${idx + 1}';
+                                  final namaPendek = namaAnak.toString().split(' ').take(2).join(' ');
+                                  final isSelected = _selectedChildIndex == idx;
+                                  return Padding(
+                                    padding: const EdgeInsets.only(right: 8),
+                                    child: InkWell(
+                                      onTap: () => setState(() => _selectedChildIndex = idx),
+                                      borderRadius: BorderRadius.circular(20),
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                                        decoration: BoxDecoration(
+                                          color: isSelected
+                                              ? const Color(0xFF0F172A)
+                                              : Colors.white,
+                                          borderRadius: BorderRadius.circular(20),
+                                          border: Border.all(
+                                            color: isSelected
+                                                ? const Color(0xFF0F172A)
+                                                : const Color(0xFFCBD5E1),
+                                          ),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            const Text('👶 ', style: TextStyle(fontSize: 12)),
+                                            Text(
+                                              '$namaPendek ✓',
+                                              style: TextStyle(
+                                                color: isSelected ? Colors.white : const Color(0xFF475569),
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
                                   );
-                                },
-                                child: const Text(
-                                  'Kelola ↗',
-                                  style: TextStyle(
-                                    fontSize: 11.5,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF059669),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                                }),
 
-                        const SizedBox(height: 14),
-
-                        // ==========================================
-                        // 4. CHILD TABS
-                        // ==========================================
-                        Row(
-                          children: [
-                            // Tab 1: Muhammad Rayyan (Active)
-                            InkWell(
-                              onTap: () => setState(() => _selectedChildIndex = 0),
-                              borderRadius: BorderRadius.circular(20),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                                decoration: BoxDecoration(
-                                  color: _selectedChildIndex == 0
-                                      ? const Color(0xFF0F172A) // Dark slate navy
-                                      : Colors.white,
+                                // + Klaim Anak tab
+                                InkWell(
+                                  onTap: () => _showAddChildDialog(isKlaim: true),
                                   borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(
-                                    color: _selectedChildIndex == 0
-                                        ? const Color(0xFF0F172A)
-                                        : const Color(0xFFCBD5E1),
-                                  ),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    const Text('👶 ', style: TextStyle(fontSize: 12)),
-                                    Text(
-                                      'Muhammad Rayyan ✓',
-                                      style: TextStyle(
-                                        color: _selectedChildIndex == 0 ? Colors.white : const Color(0xFF475569),
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-
-                            // Tab 2: + Klaim Anak
-                            InkWell(
-                              onTap: () {
-                                _showFeatureNotice(
-                                  'Klaim Anak',
-                                  'Masukkan NIK Anak atau Nomor KIA untuk menghubungkan data balita lainnya ke akun Anda.',
-                                );
-                              },
-                              borderRadius: BorderRadius.circular(20),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(
-                                    color: const Color(0xFFCBD5E1),
-                                    style: BorderStyle.solid,
-                                  ),
-                                ),
-                                child: const Text(
-                                  '+ Klaim Anak',
-                                  style: TextStyle(
-                                    color: Color(0xFF475569),
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 12),
-
-                        // ==========================================
-                        // 5. CHILD HEALTH STATS CARD
-                        // ==========================================
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: const Color(0xFFE2E8F0)),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.03),
-                                blurRadius: 12,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Child Header
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Expanded(
-                                    child: Text(
-                                      'Muhammad Rayyan Al-Ghifari',
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold,
-                                        color: Color(0xFF0F172A),
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFFF1F5F9),
-                                      borderRadius: BorderRadius.circular(8),
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(20),
+                                      border: Border.all(
+                                        color: const Color(0xFFCBD5E1),
+                                        style: BorderStyle.solid,
+                                      ),
                                     ),
                                     child: const Text(
-                                      'Usia: 14 Bulan',
+                                      '+ Klaim Anak',
                                       style: TextStyle(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.bold,
                                         color: Color(0xFF475569),
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
                                       ),
                                     ),
                                   ),
-                                ],
-                              ),
-                              const SizedBox(height: 4),
-                              const Text(
-                                'Kunjungan Terakhir: 10 Nov 2026 • Kader: Ibu Siti Aminah',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: Color(0xFF64748B),
                                 ),
-                              ),
-                              const SizedBox(height: 14),
+                              ],
+                            ),
+                          ),
 
-                              // 2x2 Metrics Grid
-                              Row(
-                                children: [
-                                  // Metric 1: Berat Badan
-                                  Expanded(
-                                    child: _buildMetricCard(
-                                      title: 'Berat Badan (BB)',
-                                      value: '9.8',
-                                      unit: 'kg',
-                                      badgeText: '↑ +0.3 kg',
-                                      badgeColor: const Color(0xFF059669),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  // Metric 2: Tinggi Badan
-                                  Expanded(
-                                    child: _buildMetricCard(
-                                      title: 'Tinggi Badan (TB)',
-                                      value: '78.2',
-                                      unit: 'cm',
-                                      badgeText: '↑ +1.1 cm',
-                                      badgeColor: const Color(0xFF059669),
-                                    ),
+                          const SizedBox(height: 12),
+
+                          // --- CHILD HEALTH STATS CARD (from selected child) ---
+                          Builder(builder: (context) {
+                            final selectedChild = _selectedChildIndex < _children.length
+                                ? _children[_selectedChildIndex]
+                                : _children.first;
+                            final namaAnak = selectedChild['nama_anak'] ?? 'Anak';
+                            final usia = selectedChild['usia_bulan']?.toString() ?? '-';
+                            final bb = selectedChild['berat_badan']?.toString() ?? '-';
+                            final tb = selectedChild['tinggi_badan']?.toString() ?? '-';
+                            final lk = selectedChild['lingkar_kepala']?.toString() ?? '-';
+                            final lila = selectedChild['lingkar_lengan']?.toString() ?? '-';
+                            final kunjunganTerakhir = selectedChild['kunjungan_terakhir'] ?? '-';
+                            final kader = selectedChild['kader'] ?? '-';
+
+                            return Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(color: const Color(0xFFE2E8F0)),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.03),
+                                    blurRadius: 12,
+                                    offset: const Offset(0, 4),
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 10),
-                              Row(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  // Metric 3: Lingkar Kepala
-                                  Expanded(
-                                    child: _buildMetricCard(
-                                      title: 'Lingkar Kepala (LK)',
-                                      value: '46.5',
-                                      unit: 'cm',
-                                      badgeText: 'Tercatat',
-                                      badgeColor: const Color(0xFF2563EB),
-                                    ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          namaAnak,
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold,
+                                            color: Color(0xFF0F172A),
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFF1F5F9),
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                        child: Text(
+                                          'Usia: $usia Bulan',
+                                          style: const TextStyle(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.bold,
+                                            color: Color(0xFF475569),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  const SizedBox(width: 10),
-                                  // Metric 4: Lingkar Lengan
-                                  Expanded(
-                                    child: _buildMetricCard(
-                                      title: 'Lingkar Lengan (LiLA)',
-                                      value: '14.2',
-                                      unit: 'cm',
-                                      badgeText: 'Tercatat',
-                                      badgeColor: const Color(0xFF2563EB),
-                                    ),
-                                  ),
-                                ],
-                              ),
-
-                              const SizedBox(height: 14),
-
-                              // Layanan Diterima Tags
-                              Row(
-                                children: [
-                                  const Text(
-                                    'Layanan Diterima:',
-                                    style: TextStyle(
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'Kunjungan Terakhir: $kunjunganTerakhir • Kader: $kader',
+                                    style: const TextStyle(
                                       fontSize: 11,
-                                      fontWeight: FontWeight.w500,
                                       color: Color(0xFF64748B),
                                     ),
                                   ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: SingleChildScrollView(
-                                      scrollDirection: Axis.horizontal,
-                                      child: Row(
-                                        children: [
-                                          _buildServiceTag('💊 Vit. A ✓'),
-                                          const SizedBox(width: 6),
-                                          _buildServiceTag('💉 PCV 1 ✓'),
-                                          const SizedBox(width: 6),
-                                          _buildServiceTag('🥣 PMT Balita ✓'),
-                                        ],
+                                  const SizedBox(height: 14),
+
+                                  // 2x2 Metrics Grid
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: _buildMetricCard(
+                                          title: 'Berat Badan (BB)',
+                                          value: bb,
+                                          unit: 'kg',
+                                          badgeText: '↑ Tercatat',
+                                          badgeColor: const Color(0xFF059669),
+                                        ),
                                       ),
+                                      const SizedBox(width: 10),
+                                      Expanded(
+                                        child: _buildMetricCard(
+                                          title: 'Tinggi Badan (TB)',
+                                          value: tb,
+                                          unit: 'cm',
+                                          badgeText: '↑ Tercatat',
+                                          badgeColor: const Color(0xFF059669),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: _buildMetricCard(
+                                          title: 'Lingkar Kepala (LK)',
+                                          value: lk,
+                                          unit: 'cm',
+                                          badgeText: 'Tercatat',
+                                          badgeColor: const Color(0xFF2563EB),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Expanded(
+                                        child: _buildMetricCard(
+                                          title: 'Lingkar Lengan (LiLA)',
+                                          value: lila,
+                                          unit: 'cm',
+                                          badgeText: 'Tercatat',
+                                          badgeColor: const Color(0xFF2563EB),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+
+                                  const SizedBox(height: 14),
+
+                                  // Layanan Diterima Tags
+                                  Row(
+                                    children: [
+                                      const Text(
+                                        'Layanan Diterima:',
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w500,
+                                          color: Color(0xFF64748B),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: SingleChildScrollView(
+                                          scrollDirection: Axis.horizontal,
+                                          child: Row(
+                                            children: [
+                                              _buildServiceTag('💊 Vit. A ✓'),
+                                              const SizedBox(width: 6),
+                                              _buildServiceTag('💉 PCV 1 ✓'),
+                                              const SizedBox(width: 6),
+                                              _buildServiceTag('🥣 PMT Balita ✓'),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+
+                                  const SizedBox(height: 14),
+
+                                  InkWell(
+                                    onTap: () {
+                                      _showFeatureNotice(
+                                        'Riwayat Pengukuran Balita',
+                                        'Menampilkan grafik KMS, riwayat penimbangan bulanan, status gizi Z-score, dan riwayat imunisasi lengkap.',
+                                      );
+                                    },
+                                    child: const Row(
+                                      children: [
+                                        Text(
+                                          'Buka Riwayat Lengkap Pengukuran Balita →',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold,
+                                            color: Color(0xFF059669),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],
                               ),
+                            );
+                          }),
 
-                              const SizedBox(height: 14),
+                          const SizedBox(height: 20),
+                        ] else ...[
+                          // ==========================================
+                          // EMPTY STATE: Belum ada anak terdaftar
+                          // ==========================================
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(24),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(color: const Color(0xFFE2E8F0)),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.03),
+                                  blurRadius: 12,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              children: [
+                                // Illustration Icon
+                                Container(
+                                  width: 72,
+                                  height: 72,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFFEF3C7),
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: const Color(0xFFFDE68A),
+                                      width: 2,
+                                    ),
+                                  ),
+                                  child: const Icon(
+                                    Icons.child_care_rounded,
+                                    color: Color(0xFFD97706),
+                                    size: 36,
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                const Text(
+                                  'Belum Ada Anak Terdaftar',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF0F172A),
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                const Text(
+                                  'Daftarkan atau klaim data anak balita Anda untuk melihat grafik tumbuh kembang, riwayat imunisasi, dan jadwal Posyandu.',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Color(0xFF64748B),
+                                    height: 1.5,
+                                  ),
+                                ),
+                                const SizedBox(height: 20),
 
-                              // Buka Riwayat Lengkap Link
-                              InkWell(
-                                onTap: () {
-                                  _showFeatureNotice(
-                                    'Riwayat Pengukuran Balita',
-                                    'Menampilkan grafik KMS, riwayat penimbangan bulanan, status gizi Z-score, dan riwayat imunisasi lengkap.',
-                                  );
-                                },
-                                child: const Row(
+                                // Action buttons
+                                Row(
                                   children: [
-                                    Text(
-                                      'Buka Riwayat Lengkap Pengukuran Balita →',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold,
-                                        color: Color(0xFF059669),
+                                    Expanded(
+                                      child: OutlinedButton.icon(
+                                        onPressed: () => _showAddChildDialog(isKlaim: true),
+                                        icon: const Icon(Icons.link_rounded, size: 18),
+                                        label: const Text('Klaim Anak', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                                        style: OutlinedButton.styleFrom(
+                                          foregroundColor: const Color(0xFF2563EB),
+                                          side: const BorderSide(color: Color(0xFF2563EB)),
+                                          padding: const EdgeInsets.symmetric(vertical: 12),
+                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Expanded(
+                                      child: ElevatedButton.icon(
+                                        onPressed: () => _showAddChildDialog(isKlaim: false),
+                                        icon: const Icon(Icons.person_add_alt_1_rounded, size: 18),
+                                        label: const Text('Daftarkan Anak', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: const Color(0xFF059669),
+                                          foregroundColor: Colors.white,
+                                          elevation: 0,
+                                          padding: const EdgeInsets.symmetric(vertical: 12),
+                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                        ),
                                       ),
                                     ),
                                   ],
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
 
-                        const SizedBox(height: 20),
+                          const SizedBox(height: 20),
+                        ],
 
                         // ==========================================
                         // 6. MENU CEPAT & LAYANAN MANDIRI
@@ -943,12 +1276,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 icon: Icons.person_add_alt_1_rounded,
                                 iconColor: const Color(0xFF2563EB),
                                 iconBgColor: const Color(0xFFEFF6FF),
-                                onTap: () {
-                                  _showFeatureNotice(
-                                    'Klaim Anak',
-                                    'Hubungkan data anak Anda ke akun SapaSehat menggunakan NIK atau Nomor Buku KIA.',
-                                  );
-                                },
+                                onTap: () => _showAddChildDialog(isKlaim: true),
                               ),
                             ),
                             const SizedBox(width: 10),
@@ -1102,10 +1430,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                           ),
                                         ),
                                         const SizedBox(width: 8),
-                                        const Expanded(
+                                        Expanded(
                                           child: Text(
-                                            'Rayyan belum terdaftar pada jadwal ini',
-                                            style: TextStyle(
+                                            _hasChildren
+                                                ? '${_children[_selectedChildIndex < _children.length ? _selectedChildIndex : 0]['nama_anak'] ?? 'Anak'} belum terdaftar pada jadwal ini'
+                                                : 'Belum ada balita terdaftar pada jadwal ini',
+                                            style: const TextStyle(
                                               fontSize: 12,
                                               fontWeight: FontWeight.bold,
                                               color: Color(0xFF0F172A),
@@ -1132,12 +1462,18 @@ class _HomeScreenState extends State<HomeScreen> {
                                       height: 44,
                                       child: ElevatedButton(
                                         onPressed: () {
+                                          if (!_hasChildren) {
+                                            _showAddChildDialog(isKlaim: false);
+                                            return;
+                                          }
+                                          final currentChild = _children[_selectedChildIndex < _children.length ? _selectedChildIndex : 0];
+                                          final nama = currentChild['nama_anak'] ?? 'Balita';
                                           _showFeatureNotice(
                                             'Booking Antrean Online',
                                             'Nomor antrean berhasil dibuat:\n'
                                             '• Nomor: A-14\n'
                                             '• Estimasi Kedatangan: 09:15 - 09:45 WIB\n'
-                                            '• Pasien: Muhammad Rayyan Al-Ghifari\n'
+                                            '• Pasien: $nama\n'
                                             'Silakan datang tepat waktu dan tunjukkan nomor antrean ini ke kader.',
                                           );
                                         },

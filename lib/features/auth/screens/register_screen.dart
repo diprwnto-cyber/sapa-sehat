@@ -165,12 +165,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   labelText: 'Nomor WhatsApp Aktif',
                   hintText: '0812-3456-7890',
                   keyboardType: TextInputType.phone,
-                  prefix: Container(
-                    margin: const EdgeInsets.only(right: 8),
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  prefixWidget: Container(
+                    margin: const EdgeInsets.only(left: 10, right: 10),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
                       color: const Color(0xFFF1F5F9),
-                      borderRadius: BorderRadius.circular(6),
+                      borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Text(
                       '+62',
@@ -184,6 +185,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   validator: (val) {
                     if (val == null || val.trim().isEmpty) {
                       return 'Nomor WhatsApp wajib diisi';
+                    }
+                    final digits = val.replaceAll(RegExp(r'\D'), '');
+                    if (digits.length < 12) {
+                      return 'nomor tidak boleh kurang dari 12';
                     }
                     return null;
                   },

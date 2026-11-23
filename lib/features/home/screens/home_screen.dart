@@ -710,109 +710,109 @@ class _HomeScreenState extends State<HomeScreen> {
                         const SizedBox(height: 16),
 
                         // ==========================================
-                        // 2. PENGUMUMAN RESMI POSYANDU BANNER
+                        // 2-5. CONDITIONAL: CHILD DATA or EMPTY STATE
+                        // (Pengumuman Resmi, Status Akun Terhubung, & Kartu Anak
+                        //  hanya muncul ketika sudah ada anak / baru mendaftarkan anak)
                         // ==========================================
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(14),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFFFFBEB), // Soft yellow
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: const Color(0xFFFDE047), // Amber yellow border
-                              width: 1,
+                        if (_hasChildren) ...[
+                          // --- PENGUMUMAN RESMI POSYANDU BANNER ---
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(14),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFFFBEB), // Soft yellow
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: const Color(0xFFFDE047), // Amber yellow border
+                                width: 1,
+                              ),
                             ),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  // Pill Tag
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                                    decoration: BoxDecoration(
-                                      gradient: const LinearGradient(
-                                        colors: [Color(0xFFF59E0B), Color(0xFFD97706)],
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    // Pill Tag
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                      decoration: BoxDecoration(
+                                        gradient: const LinearGradient(
+                                          colors: [Color(0xFFF59E0B), Color(0xFFD97706)],
+                                        ),
+                                        borderRadius: BorderRadius.circular(6),
                                       ),
-                                      borderRadius: BorderRadius.circular(6),
+                                      child: const Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text('📢 ', style: TextStyle(fontSize: 10)),
+                                          Text(
+                                            'PENGUMUMAN RESMI POSYANDU',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 9,
+                                              fontWeight: FontWeight.bold,
+                                              letterSpacing: 0.3,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                    child: const Row(
-                                      mainAxisSize: MainAxisSize.min,
+                                    const Text(
+                                      'Bidan Siti • 20 Nov',
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w500,
+                                        color: Color(0xFF78350F),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                const Text(
+                                  'Pemberian Kapsul Vitamin A & Wajib Bawa KIA Fisik',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF78350F),
+                                    height: 1.3,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                InkWell(
+                                  onTap: () {
+                                    _showFeatureNotice(
+                                      'Pemberian Vitamin A',
+                                      'Pelayanan Posyandu tanggal 25 Nov 2026 menyediakan suplementasi Vitamin A dosis tinggi untuk Balita. '
+                                      'Orang tua wajib membawa buku KIA (Kesehatan Ibu dan Anak) fisik untuk pencatatan resmi.',
+                                    );
+                                  },
+                                  child: RichText(
+                                    text: const TextSpan(
+                                      text: 'Pelayanan 25 Nov menyediakan Vitamin A. Bawa buku KIA... ',
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: Color(0xFF92400E),
+                                        height: 1.3,
+                                      ),
                                       children: [
-                                        Text('📢 ', style: TextStyle(fontSize: 10)),
-                                        Text(
-                                          'PENGUMUMAN RESMI POSYANDU',
+                                        TextSpan(
+                                          text: 'Baca →',
                                           style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 9,
                                             fontWeight: FontWeight.bold,
-                                            letterSpacing: 0.3,
+                                            color: Color(0xFFB45309),
                                           ),
                                         ),
                                       ],
                                     ),
                                   ),
-                                  const Text(
-                                    'Bidan Siti • 20 Nov',
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w500,
-                                      color: Color(0xFF78350F),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                              const Text(
-                                'Pemberian Kapsul Vitamin A & Wajib Bawa KIA Fisik',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF78350F),
-                                  height: 1.3,
                                 ),
-                              ),
-                              const SizedBox(height: 4),
-                              InkWell(
-                                onTap: () {
-                                  _showFeatureNotice(
-                                    'Pemberian Vitamin A',
-                                    'Pelayanan Posyandu tanggal 25 Nov 2026 menyediakan suplementasi Vitamin A dosis tinggi untuk Balita. '
-                                    'Orang tua wajib membawa buku KIA (Kesehatan Ibu dan Anak) fisik untuk pencatatan resmi.',
-                                  );
-                                },
-                                child: RichText(
-                                  text: const TextSpan(
-                                    text: 'Pelayanan 25 Nov menyediakan Vitamin A. Bawa buku KIA... ',
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      color: Color(0xFF92400E),
-                                      height: 1.3,
-                                    ),
-                                    children: [
-                                      TextSpan(
-                                        text: 'Baca →',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: Color(0xFFB45309),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
 
-                        const SizedBox(height: 12),
+                          const SizedBox(height: 12),
 
-                        // ==========================================
-                        // 3-5. CONDITIONAL: CHILD DATA or EMPTY STATE
-                        // ==========================================
-                        if (_hasChildren) ...[
                           // --- VERIFIED ACCOUNT BANNER ---
                           Container(
                             width: double.infinity,

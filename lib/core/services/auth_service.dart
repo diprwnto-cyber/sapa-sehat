@@ -110,6 +110,25 @@ class AuthService {
     await _client.auth.resetPasswordForEmail(email.trim());
   }
 
+  /// Ambil daftar anak balita milik pengguna dari tabel 'anak_balita'
+  Future<List<Map<String, dynamic>>> getChildren() async {
+    final user = currentUser;
+    if (user == null) return [];
+
+    try {
+      final data = await _client
+          .from('anak_balita')
+          .select()
+          .eq('pengguna_id', user.id)
+          .order('created_at', ascending: false);
+
+      return List<Map<String, dynamic>>.from(data);
+    } catch (_) {
+      // Tabel belum ada atau RLS / permission error
+      return [];
+    }
+  }
+
   /// Ambil data profil dari tabel 'pengguna'
   Future<Map<String, dynamic>?> getProfile() async {
     final user = currentUser;

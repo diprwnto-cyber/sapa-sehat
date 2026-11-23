@@ -5,7 +5,6 @@ class CustomTextField extends StatelessWidget {
   final TextEditingController controller;
   final String hintText;
   final String? labelText;
-  final Widget? prefix;
   final Widget? prefixWidget;
   final IconData? prefixIcon;
   final Widget? suffixIcon;
@@ -20,7 +19,6 @@ class CustomTextField extends StatelessWidget {
     required this.controller,
     required this.hintText,
     this.labelText,
-    this.prefix,
     this.prefixWidget,
     this.prefixIcon,
     this.suffixIcon,
@@ -68,15 +66,13 @@ class CustomTextField extends StatelessWidget {
             ),
             filled: true,
             fillColor: Colors.white,
-            prefix: prefix,
-            // prefixWidget ensures +62 is ALWAYS visible even when not focused and not typed
             prefixIcon: prefixWidget ??
                 (prefixIcon != null
-                    ? Icon(prefixIcon, color: AppColors.textSecondary, size: 19)
+                    ? Icon(prefixIcon, color: AppColors.textSecondary, size: 20)
                     : null),
             prefixIconConstraints: const BoxConstraints(
-              minWidth: 0,
-              minHeight: 0,
+              minWidth: 48,
+              minHeight: 48,
             ),
             suffixIcon: suffixIcon,
             contentPadding: const EdgeInsets.symmetric(

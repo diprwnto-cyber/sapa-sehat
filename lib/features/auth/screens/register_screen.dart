@@ -159,28 +159,39 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 const SizedBox(height: 14),
 
-                // Nomor WhatsApp Aktif (with +62 prefix badge matching Figma)
+                // Nomor WhatsApp Aktif (Aligned Icon + +62 + Divider)
                 CustomTextField(
                   controller: _noHpController,
                   labelText: 'Nomor WhatsApp Aktif',
-                  hintText: '0812-3456-7890',
+                  hintText: '812-3456-7890',
                   keyboardType: TextInputType.phone,
                   autovalidateMode: AutovalidateMode.onUserInteraction,
-                  prefixWidget: Container(
-                    margin: const EdgeInsets.only(left: 10, right: 10),
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF1F5F9),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Text(
-                      '+62',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
+                  prefixWidget: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const SizedBox(width: 14),
+                      const Icon(
+                        Icons.phone_iphone_rounded,
+                        color: AppColors.textSecondary,
+                        size: 20,
                       ),
-                    ),
+                      const SizedBox(width: 8),
+                      const Text(
+                        '+62',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Container(
+                        width: 1,
+                        height: 20,
+                        color: AppColors.border,
+                      ),
+                      const SizedBox(width: 8),
+                    ],
                   ),
                   validator: (val) {
                     if (val == null || val.trim().isEmpty) {

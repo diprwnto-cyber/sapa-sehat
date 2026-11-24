@@ -2,6 +2,7 @@ import 'package:material_ui/material_ui.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../home/screens/home_screen.dart';
 import 'tambah_balita_screen.dart';
+import '../../koreksi/screens/rincian_kunjungan_screen.dart';
 
 class AnakSayaScreen extends StatefulWidget {
   final String? initialChildName;
@@ -822,7 +823,12 @@ class _AnakSayaScreenState extends State<AnakSayaScreen> {
                       const SizedBox(height: 12),
 
                       InkWell(
-                        onTap: () => _showNotice('Riwayat Pengukuran', 'Grafik KMS dan riwayat penimbangan bulanan balita.'),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const RincianKunjunganScreen()),
+                          );
+                        },
                         child: const Text(
                           'Buka Riwayat Lengkap Pengukuran Balita →',
                           style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF059669)),
@@ -863,6 +869,11 @@ class _AnakSayaScreenState extends State<AnakSayaScreen> {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (_) => const HomeScreen()),
+              );
+            } else if (index == 3) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const RincianKunjunganScreen()),
               );
             } else if (index != 1) {
               final titles = ['Beranda', 'Anak Saya', 'Jadwal', 'Riwayat', 'Profil'];

@@ -4,6 +4,8 @@ import '../../../core/services/auth_service.dart';
 import '../../auth/screens/login_screen.dart';
 import '../../children/screens/tambah_balita_screen.dart';
 import '../../children/screens/anak_saya_screen.dart';
+import '../../koreksi/screens/rincian_kunjungan_screen.dart';
+import '../../koreksi/screens/formulir_koreksi_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -1111,9 +1113,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
                                   InkWell(
                                     onTap: () {
-                                      _showFeatureNotice(
-                                        'Riwayat Pengukuran Balita',
-                                        'Menampilkan grafik KMS, riwayat penimbangan bulanan, status gizi Z-score, dan riwayat imunisasi lengkap.',
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => const RincianKunjunganScreen(),
+                                        ),
                                       );
                                     },
                                     child: const Row(
@@ -1313,9 +1317,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                 iconColor: const Color(0xFFD97706),
                                 iconBgColor: const Color(0xFFFEF3C7),
                                 onTap: () {
-                                  _showFeatureNotice(
-                                    'Koreksi Data',
-                                    'Ajukan permohonan koreksi nama, tanggal lahir, atau alamat balita ke kader Posyandu.',
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (_) => const FormulirKoreksiScreen()),
                                   );
                                 },
                               ),
@@ -1565,6 +1569,11 @@ class _HomeScreenState extends State<HomeScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => const AnakSayaScreen()),
+              );
+            } else if (index == 3) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const RincianKunjunganScreen()),
               );
             } else if (index == 4) {
               _showProfileSheet();

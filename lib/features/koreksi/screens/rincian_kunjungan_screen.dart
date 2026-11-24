@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 import '../../home/screens/home_screen.dart';
 import '../../children/screens/anak_saya_screen.dart';
+import '../../imunisasi/screens/buku_imunisasi_screen.dart';
 import 'formulir_koreksi_screen.dart';
 
 class RincianKunjunganScreen extends StatelessWidget {
@@ -463,7 +464,12 @@ class RincianKunjunganScreen extends StatelessWidget {
               // ==========================================
               // 5. MEJA 5: IMUNISASI & NAKES
               // ==========================================
-              Container(
+              GestureDetector(
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const BukuImunisasiScreen()),
+                ),
+                child: Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
@@ -474,10 +480,10 @@ class RincianKunjunganScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Row(
+                    Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
+                        const Text(
                           'MEJA 5: IMUNISASI & NAKES',
                           style: TextStyle(
                             fontSize: 10.5,
@@ -485,13 +491,19 @@ class RincianKunjunganScreen extends StatelessWidget {
                             color: Color(0xFF2563EB),
                           ),
                         ),
-                        Text(
-                          'Bidan Nurul, A.Md.Keb',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF475569),
-                          ),
+                        Row(
+                          children: [
+                            const Text(
+                              'Bidan Nurul, A.Md.Keb',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF475569),
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            const Icon(Icons.chevron_right_rounded, size: 16, color: Color(0xFF7C3AED)),
+                          ],
                         ),
                       ],
                     ),
@@ -519,8 +531,18 @@ class RincianKunjunganScreen extends StatelessWidget {
                         color: Color(0xFF059669),
                       ),
                     ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Lihat Buku Imunisasi Digital →',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF7C3AED),
+                      ),
+                    ),
                   ],
                 ),
+              ),
               ),
 
               const SizedBox(height: 14),

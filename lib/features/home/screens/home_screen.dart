@@ -6,6 +6,7 @@ import '../../children/screens/tambah_balita_screen.dart';
 import '../../children/screens/anak_saya_screen.dart';
 import '../../koreksi/screens/rincian_kunjungan_screen.dart';
 import '../../koreksi/screens/formulir_koreksi_screen.dart';
+import '../../imunisasi/screens/buku_imunisasi_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -1334,9 +1335,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                 iconColor: const Color(0xFF7C3AED),
                                 iconBgColor: const Color(0xFFF5F3FF),
                                 onTap: () {
-                                  _showFeatureNotice(
-                                    'Buku Imunisasi',
-                                    'Lihat jadwal dan riwayat vaksin wajib: BCG, Polio, DPT-HB-Hib, PCV, Campak-Rubella.',
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (_) => const BukuImunisasiScreen()),
                                   );
                                 },
                               ),

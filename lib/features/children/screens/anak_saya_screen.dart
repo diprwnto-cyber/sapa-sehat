@@ -1,6 +1,8 @@
 import 'package:material_ui/material_ui.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../home/screens/home_screen.dart';
+import '../../jadwal/screens/jadwal_posyandu_screen.dart';
+import '../../profil/screens/profil_screen.dart';
 import 'tambah_balita_screen.dart';
 import '../../koreksi/screens/rincian_kunjungan_screen.dart';
 
@@ -1156,11 +1158,12 @@ class _AnakSayaScreenState extends State<AnakSayaScreen> {
           onTap: (index) {
             if (index == 0) {
               Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomeScreen()));
+            } else if (index == 2) {
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const JadwalPosyanduScreen()));
             } else if (index == 3) {
               Navigator.push(context, MaterialPageRoute(builder: (_) => const RincianKunjunganScreen()));
-            } else if (index != 1) {
-              final titles = ['Beranda', 'Anak Saya', 'Jadwal', 'Riwayat', 'Profil'];
-              _showNotice(titles[index], 'Halaman ${titles[index]} sedang dipersiapkan.');
+            } else if (index == 4) {
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const ProfilScreen()));
             }
           },
           type: BottomNavigationBarType.fixed,

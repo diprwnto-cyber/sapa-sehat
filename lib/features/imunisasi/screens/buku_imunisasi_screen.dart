@@ -1,6 +1,9 @@
 import 'package:material_ui/material_ui.dart';
 import '../../home/screens/home_screen.dart';
 import '../../children/screens/anak_saya_screen.dart';
+import '../../jadwal/screens/jadwal_posyandu_screen.dart';
+import '../../koreksi/screens/rincian_kunjungan_screen.dart';
+import '../../profil/screens/profil_screen.dart';
 
 class BukuImunisasiScreen extends StatefulWidget {
   final String namaBalita;
@@ -663,6 +666,12 @@ class _BukuImunisasiScreenState extends State<BukuImunisasiScreen> {
               Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomeScreen()));
             } else if (index == 1) {
               Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const AnakSayaScreen()));
+            } else if (index == 2) {
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const JadwalPosyanduScreen()));
+            } else if (index == 3) {
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const RincianKunjunganScreen()));
+            } else if (index == 4) {
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const ProfilScreen()));
             }
           },
           type: BottomNavigationBarType.fixed,

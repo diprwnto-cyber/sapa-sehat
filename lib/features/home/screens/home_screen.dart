@@ -1,12 +1,16 @@
-import 'package:material_ui/material_ui.dart';
+﻿import 'package:material_ui/material_ui.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/services/antrean_state.dart';
 import '../../../core/services/auth_service.dart';
-import '../../auth/screens/login_screen.dart';
 import '../../children/screens/tambah_balita_screen.dart';
 import '../../children/screens/anak_saya_screen.dart';
 import '../../koreksi/screens/rincian_kunjungan_screen.dart';
 import '../../koreksi/screens/formulir_koreksi_screen.dart';
 import '../../imunisasi/screens/buku_imunisasi_screen.dart';
+import '../../jadwal/screens/jadwal_posyandu_screen.dart';
+import '../../jadwal/screens/pendaftaran_kunjungan_screen.dart';
+import '../../jadwal/screens/tiket_antrean_screen.dart';
+import '../../profil/screens/profil_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -27,7 +31,18 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    antreanState.addListener(_onAntreanChanged);
     _loadData();
+  }
+
+  @override
+  void dispose() {
+    antreanState.removeListener(_onAntreanChanged);
+    super.dispose();
+  }
+
+  void _onAntreanChanged() {
+    if (mounted) setState(() {});
   }
 
   Future<void> _loadData() async {
@@ -87,256 +102,6 @@ class _HomeScreenState extends State<HomeScreen> {
       return parts[0].substring(0, parts[0].length >= 2 ? 2 : 1).toUpperCase();
     }
     return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
-  }
-
-  Future<void> _handleLogout() async {
-    final confirm = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Keluar dari Akun', style: TextStyle(fontWeight: FontWeight.bold)),
-        content: const Text('Apakah Anda yakin ingin keluar dari aplikasi SapaSehat?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Batal', style: TextStyle(color: AppColors.textSecondary)),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.error,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            ),
-            child: const Text('Keluar'),
-          ),
-        ],
-      ),
-    );
-
-    if (confirm == true) {
-      await authService.signOut();
-      if (!mounted) return;
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (_) => const LoginScreen()),
-        (route) => false,
-      );
-    }
-  }
-
-  void _showAddChildDialog({bool isKlaim = false}) {
-    final nameController = TextEditingController(text: isKlaim ? '' : 'Muhammad Rayyan Al-Ghifari');
-    final nikController = TextEditingController(text: isKlaim ? '3201123456780001' : '');
-    final usiaController = TextEditingController(text: '14');
-    String jenisKelamin = 'Laki-laki';
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (ctx) => StatefulBuilder(
-        builder: (context, setModalState) => Padding(
-          padding: EdgeInsets.only(
-            left: 24,
-            right: 24,
-            top: 20,
-            bottom: MediaQuery.of(context).viewInsets.bottom + 24,
-          ),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Container(
-                    width: 40,
-                    height: 4,
-                    margin: const EdgeInsets.only(bottom: 16),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade300,
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                ),
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: isKlaim ? const Color(0xFFEFF6FF) : const Color(0xFFECFDF5),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Icon(
-                        isKlaim ? Icons.link_rounded : Icons.child_care_rounded,
-                        color: isKlaim ? const Color(0xFF2563EB) : const Color(0xFF059669),
-                        size: 24,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        isKlaim ? 'Klaim Data Anak' : 'Daftarkan Anak Baru',
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF0F172A),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-
-                // Form Fields
-                Text(
-                  isKlaim ? 'Nomor Induk Kependudukan (NIK) Anak / KIA' : 'Nama Lengkap Anak Balita',
-                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF475569)),
-                ),
-                const SizedBox(height: 6),
-                TextField(
-                  controller: isKlaim ? nikController : nameController,
-                  decoration: InputDecoration(
-                    hintText: isKlaim ? 'Contoh: 3201xxxxxxxxxxxx' : 'Contoh: Muhammad Rayyan',
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Color(0xFF059669), width: 1.5),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-
-                if (!isKlaim) ...[
-                  const Text(
-                    'Usia Balita (Bulan)',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF475569)),
-                  ),
-                  const SizedBox(height: 6),
-                  TextField(
-                    controller: usiaController,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      hintText: 'Contoh: 14',
-                      suffixText: 'Bulan',
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Color(0xFF059669), width: 1.5),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-
-                  const Text(
-                    'Jenis Kelamin',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF475569)),
-                  ),
-                  const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ChoiceChip(
-                          label: const Center(child: Text('Laki-laki')),
-                          selected: jenisKelamin == 'Laki-laki',
-                          selectedColor: const Color(0xFFECFDF5),
-                          labelStyle: TextStyle(
-                            color: jenisKelamin == 'Laki-laki' ? const Color(0xFF059669) : const Color(0xFF475569),
-                            fontWeight: FontWeight.bold,
-                          ),
-                          onSelected: (val) => setModalState(() => jenisKelamin = 'Laki-laki'),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: ChoiceChip(
-                          label: const Center(child: Text('Perempuan')),
-                          selected: jenisKelamin == 'Perempuan',
-                          selectedColor: const Color(0xFFECFDF5),
-                          labelStyle: TextStyle(
-                            color: jenisKelamin == 'Perempuan' ? const Color(0xFF059669) : const Color(0xFF475569),
-                            fontWeight: FontWeight.bold,
-                          ),
-                          onSelected: (val) => setModalState(() => jenisKelamin = 'Perempuan'),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                ],
-
-                // Submit Button
-                SizedBox(
-                  width: double.infinity,
-                  height: 46,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      final childName = isKlaim
-                          ? 'Muhammad Rayyan Al-Ghifari'
-                          : (nameController.text.trim().isEmpty ? 'Muhammad Rayyan Al-Ghifari' : nameController.text.trim());
-                      final age = int.tryParse(usiaController.text) ?? 14;
-
-                      final newChild = {
-                        'id': DateTime.now().millisecondsSinceEpoch.toString(),
-                        'nama_anak': childName,
-                        'usia_bulan': age,
-                        'jenis_kelamin': jenisKelamin,
-                        'berat_badan': '9.8',
-                        'tinggi_badan': '78.2',
-                        'lingkar_kepala': '46.5',
-                        'lingkar_lengan': '14.2',
-                        'kunjungan_terakhir': '10 Nov 2026',
-                        'kader': 'Ibu Siti Aminah',
-                        'status_verifikasi': 'terverifikasi',
-                      };
-
-                      setState(() {
-                        _children.add(newChild);
-                        _selectedChildIndex = _children.length - 1;
-                      });
-
-                      Navigator.pop(ctx);
-
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          backgroundColor: const Color(0xFF059669),
-                          content: Text(
-                            isKlaim
-                                ? 'Berhasil! Data anak berhasil diklaim dan diverifikasi.'
-                                : 'Berhasil! Data anak $childName berhasil didaftarkan.',
-                          ),
-                        ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF059669),
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      elevation: 0,
-                    ),
-                    child: Text(
-                      isKlaim ? 'Klaim Sekarang' : 'Daftarkan Sekarang',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
   }
 
   void _showFeatureNotice(String title, String description) {
@@ -413,125 +178,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _showProfileSheet() {
-    final displayName = _getUserDisplayName();
-    final email = _profile?['email'] ?? authService.currentUser?.email ?? '-';
-    final noHp = _profile?['no_hp'] ?? authService.currentUser?.userMetadata?['no_hp'] ?? '-';
-    final initials = _getInitials(displayName);
-
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (ctx) => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                margin: const EdgeInsets.only(bottom: 20),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
-            Container(
-              width: 64,
-              height: 64,
-              decoration: BoxDecoration(
-                color: const Color(0xFFCCFBF1),
-                shape: BoxShape.circle,
-                border: Border.all(color: const Color(0xFF0D9488), width: 2),
-              ),
-              alignment: Alignment.center,
-              child: Text(
-                initials,
-                style: const TextStyle(
-                  color: Color(0xFF0F766E),
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              displayName,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Peran: Wali / Orang Tua Balita',
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey.shade600,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF8FAFC),
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: const Color(0xFFE2E8F0)),
-              ),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.email_outlined, size: 18, color: AppColors.textSecondary),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Text(email, style: const TextStyle(fontSize: 13, color: AppColors.textPrimary)),
-                      ),
-                    ],
-                  ),
-                  const Divider(height: 18, color: Color(0xFFE2E8F0)),
-                  Row(
-                    children: [
-                      const Icon(Icons.phone_outlined, size: 18, color: AppColors.textSecondary),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Text(noHp, style: const TextStyle(fontSize: 13, color: AppColors.textPrimary)),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: OutlinedButton.icon(
-                onPressed: () {
-                  Navigator.pop(ctx);
-                  _handleLogout();
-                },
-                icon: const Icon(Icons.logout_rounded, color: AppColors.error),
-                label: const Text('Keluar dari Akun', style: TextStyle(color: AppColors.error, fontWeight: FontWeight.bold)),
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: AppColors.error),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-          ],
-        ),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -611,7 +257,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    '$greeting, $displayName 👋',
+                                    '$greeting, $displayName ðŸ‘‹',
                                     style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
@@ -632,7 +278,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       const SizedBox(width: 4),
                                       const Expanded(
                                         child: Text(
-                                          'Posyandu Melati RW 03 • Kel. Karanganyar',
+                                          'Posyandu Melati RW 03 â€¢ Kel. Karanganyar',
                                           style: TextStyle(
                                             fontSize: 11,
                                             fontWeight: FontWeight.w500,
@@ -750,7 +396,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       child: const Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          Text('📢 ', style: TextStyle(fontSize: 10)),
+                                          Text('ðŸ“¢ ', style: TextStyle(fontSize: 10)),
                                           Text(
                                             'PENGUMUMAN RESMI POSYANDU',
                                             style: TextStyle(
@@ -764,7 +410,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       ),
                                     ),
                                     const Text(
-                                      'Bidan Siti • 20 Nov',
+                                      'Bidan Siti â€¢ 20 Nov',
                                       style: TextStyle(
                                         fontSize: 11,
                                         fontWeight: FontWeight.w500,
@@ -802,7 +448,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       ),
                                       children: [
                                         TextSpan(
-                                          text: 'Baca →',
+                                          text: 'Baca â†’',
                                           style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             color: Color(0xFFB45309),
@@ -858,7 +504,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     );
                                   },
                                   child: const Text(
-                                    'Kelola ↗',
+                                    'Kelola â†—',
                                     style: TextStyle(
                                       fontSize: 11.5,
                                       fontWeight: FontWeight.bold,
@@ -905,9 +551,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                         child: Row(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
-                                            const Text('👶 ', style: TextStyle(fontSize: 12)),
+                                            const Text('ðŸ‘¶ ', style: TextStyle(fontSize: 12)),
                                             Text(
-                                              '$namaPendek ✓',
+                                              '$namaPendek âœ“',
                                               style: TextStyle(
                                                 color: isSelected ? Colors.white : const Color(0xFF475569),
                                                 fontSize: 12,
@@ -1022,7 +668,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    'Kunjungan Terakhir: $kunjunganTerakhir • Kader: $kader',
+                                    'Kunjungan Terakhir: $kunjunganTerakhir â€¢ Kader: $kader',
                                     style: const TextStyle(
                                       fontSize: 11,
                                       color: Color(0xFF64748B),
@@ -1038,7 +684,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           title: 'Berat Badan (BB)',
                                           value: bb,
                                           unit: 'kg',
-                                          badgeText: '↑ Tercatat',
+                                          badgeText: 'â†‘ Tercatat',
                                           badgeColor: const Color(0xFF059669),
                                         ),
                                       ),
@@ -1048,7 +694,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           title: 'Tinggi Badan (TB)',
                                           value: tb,
                                           unit: 'cm',
-                                          badgeText: '↑ Tercatat',
+                                          badgeText: 'â†‘ Tercatat',
                                           badgeColor: const Color(0xFF059669),
                                         ),
                                       ),
@@ -1098,11 +744,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                           scrollDirection: Axis.horizontal,
                                           child: Row(
                                             children: [
-                                              _buildServiceTag('💊 Vit. A ✓'),
+                                              _buildServiceTag('ðŸ’Š Vit. A âœ“'),
                                               const SizedBox(width: 6),
-                                              _buildServiceTag('💉 PCV 1 ✓'),
+                                              _buildServiceTag('ðŸ’‰ PCV 1 âœ“'),
                                               const SizedBox(width: 6),
-                                              _buildServiceTag('🥣 PMT Balita ✓'),
+                                              _buildServiceTag('ðŸ¥£ PMT Balita âœ“'),
                                             ],
                                           ),
                                         ),
@@ -1124,7 +770,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     child: const Row(
                                       children: [
                                         Text(
-                                          'Buka Riwayat Lengkap Pengukuran Balita →',
+                                          'Buka Riwayat Lengkap Pengukuran Balita â†’',
                                           style: TextStyle(
                                             fontSize: 12,
                                             fontWeight: FontWeight.bold,
@@ -1284,9 +930,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                 badgeText: 'BUKA',
                                 isPrimary: true,
                                 onTap: () {
-                                  _showFeatureNotice(
-                                    'Daftar Antrean',
-                                    'Pendaftaran antrean online Posyandu Melati RW 03 telah dibuka untuk jadwal Rabu, 25 Nov 2026.',
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (_) => const JadwalPosyanduScreen()),
                                   );
                                 },
                               ),
@@ -1403,7 +1049,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       borderRadius: BorderRadius.circular(6),
                                     ),
                                     child: const Text(
-                                      'Sisa 12 Slot ⏳',
+                                      'Sisa 12 Slot â³',
                                       style: TextStyle(
                                         color: Color(0xFF92400E),
                                         fontSize: 10,
@@ -1428,7 +1074,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                               // Location info
                               Text(
-                                '📍 Balai RW 03 • 08:00 - 11:30 WIB • Timbang & PCV 2',
+                                'ðŸ“ Balai RW 03 â€¢ 08:00 - 11:30 WIB â€¢ Timbang & PCV 2',
                                 style: TextStyle(
                                   color: Colors.white.withValues(alpha: 0.88),
                                   fontSize: 11,
@@ -1453,17 +1099,21 @@ class _HomeScreenState extends State<HomeScreen> {
                                         Container(
                                           width: 8,
                                           height: 8,
-                                          decoration: const BoxDecoration(
-                                            color: Color(0xFFF59E0B), // Orange dot
+                                          decoration: BoxDecoration(
+                                            color: antreanState.hasActiveTicket
+                                                ? const Color(0xFF10B981)
+                                                : const Color(0xFFF59E0B),
                                             shape: BoxShape.circle,
                                           ),
                                         ),
                                         const SizedBox(width: 8),
                                         Expanded(
                                           child: Text(
-                                            _hasChildren
-                                                ? '${_children[_selectedChildIndex < _children.length ? _selectedChildIndex : 0]['nama_anak'] ?? 'Anak'} belum terdaftar pada jadwal ini'
-                                                : 'Belum ada balita terdaftar pada jadwal ini',
+                                            antreanState.hasActiveTicket
+                                                ? 'Terdaftar Antrean ${antreanState.activeTicket!.nomorAntrean} (${antreanState.activeTicket!.namaBalita})'
+                                                : (_hasChildren
+                                                    ? '${_children[_selectedChildIndex < _children.length ? _selectedChildIndex : 0]['nama_anak'] ?? 'Anak'} belum terdaftar pada jadwal ini'
+                                                    : 'Belum ada balita terdaftar pada jadwal ini'),
                                             style: const TextStyle(
                                               fontSize: 12,
                                               fontWeight: FontWeight.bold,
@@ -1473,11 +1123,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ),
                                       ],
                                     ),
-                                    const Padding(
-                                      padding: EdgeInsets.only(left: 16.0, top: 2),
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 16.0, top: 2),
                                       child: Text(
-                                        'Ambil nomor antrean & tentukan estimasi jam kedatangan',
-                                        style: TextStyle(
+                                        antreanState.hasActiveTicket
+                                            ? '${antreanState.activeTicket!.sesi} â€¢ Bawa Buku KIA Fisik'
+                                            : 'Ambil nomor antrean & tentukan estimasi jam kedatangan',
+                                        style: const TextStyle(
                                           fontSize: 10.5,
                                           color: Color(0xFF64748B),
                                         ),
@@ -1491,19 +1143,20 @@ class _HomeScreenState extends State<HomeScreen> {
                                       height: 44,
                                       child: ElevatedButton(
                                         onPressed: () {
-                                          if (!_hasChildren) {
-                                            _showAddChildDialog(isKlaim: false);
+                                          if (antreanState.hasActiveTicket) {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) => const TiketAntreanScreen(),
+                                              ),
+                                            );
                                             return;
                                           }
-                                          final currentChild = _children[_selectedChildIndex < _children.length ? _selectedChildIndex : 0];
-                                          final nama = currentChild['nama_anak'] ?? 'Balita';
-                                          _showFeatureNotice(
-                                            'Booking Antrean Online',
-                                            'Nomor antrean berhasil dibuat:\n'
-                                            '• Nomor: A-14\n'
-                                            '• Estimasi Kedatangan: 09:15 - 09:45 WIB\n'
-                                            '• Pasien: $nama\n'
-                                            'Silakan datang tepat waktu dan tunjukkan nomor antrean ini ke kader.',
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (_) => const PendaftaranKunjunganScreen(),
+                                            ),
                                           );
                                         },
                                         style: ElevatedButton.styleFrom(
@@ -1514,14 +1167,21 @@ class _HomeScreenState extends State<HomeScreen> {
                                             borderRadius: BorderRadius.circular(12),
                                           ),
                                         ),
-                                        child: const Row(
+                                        child: Row(
                                           mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
-                                            Icon(Icons.confirmation_number_outlined, size: 18),
-                                            SizedBox(width: 8),
+                                            Icon(
+                                              antreanState.hasActiveTicket
+                                                  ? Icons.qr_code_2_rounded
+                                                  : Icons.confirmation_number_outlined,
+                                              size: 18,
+                                            ),
+                                            const SizedBox(width: 8),
                                             Text(
-                                              'Booking Antrean Online Sekarang →',
-                                              style: TextStyle(
+                                              antreanState.hasActiveTicket
+                                                  ? 'Lihat Tiket Antrean (${antreanState.activeTicket!.nomorAntrean}) â†’'
+                                                  : 'Booking Antrean Online Sekarang â†’',
+                                              style: const TextStyle(
                                                 fontSize: 12.5,
                                                 fontWeight: FontWeight.bold,
                                               ),
@@ -1571,18 +1231,20 @@ class _HomeScreenState extends State<HomeScreen> {
                 context,
                 MaterialPageRoute(builder: (_) => const AnakSayaScreen()),
               );
+            } else if (index == 2) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const JadwalPosyanduScreen()),
+              );
             } else if (index == 3) {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => const RincianKunjunganScreen()),
               );
             } else if (index == 4) {
-              _showProfileSheet();
-            } else if (index != 0) {
-              final titles = ['Beranda', 'Anak Saya', 'Jadwal', 'Riwayat', 'Profil'];
-              _showFeatureNotice(
-                titles[index],
-                'Halaman ${titles[index]} sedang dipersiapkan untuk sinkronisasi data Posyandu.',
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ProfilScreen()),
               );
             }
           },

@@ -2,6 +2,8 @@ import 'package:material_ui/material_ui.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/services/auth_service.dart';
 import '../../auth/screens/login_screen.dart';
+import '../../children/screens/tambah_balita_screen.dart';
+import '../../children/screens/anak_saya_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -845,9 +847,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                                 InkWell(
                                   onTap: () {
-                                    _showFeatureNotice(
-                                      'Kelola Akun Anak',
-                                      'Akun Anda telah terhubung dan terverifikasi dengan data balita di database Posyandu.',
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => const AnakSayaScreen(initialStatusPending: false),
+                                      ),
                                     );
                                   },
                                   child: const Text(
@@ -916,7 +920,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
                                 // + Klaim Anak tab
                                 InkWell(
-                                  onTap: () => _showAddChildDialog(isKlaim: true),
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (_) => const TambahBalitaScreen()),
+                                    );
+                                  },
                                   borderRadius: BorderRadius.circular(20),
                                   child: Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
@@ -1191,7 +1200,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                   children: [
                                     Expanded(
                                       child: OutlinedButton.icon(
-                                        onPressed: () => _showAddChildDialog(isKlaim: true),
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(builder: (_) => const TambahBalitaScreen()),
+                                          );
+                                        },
                                         icon: const Icon(Icons.link_rounded, size: 18),
                                         label: const Text('Klaim Anak', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
                                         style: OutlinedButton.styleFrom(
@@ -1205,7 +1219,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                     const SizedBox(width: 10),
                                     Expanded(
                                       child: ElevatedButton.icon(
-                                        onPressed: () => _showAddChildDialog(isKlaim: false),
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(builder: (_) => const TambahBalitaScreen()),
+                                          );
+                                        },
                                         icon: const Icon(Icons.person_add_alt_1_rounded, size: 18),
                                         label: const Text('Daftarkan Anak', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
                                         style: ElevatedButton.styleFrom(
@@ -1276,7 +1295,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                 icon: Icons.person_add_alt_1_rounded,
                                 iconColor: const Color(0xFF2563EB),
                                 iconBgColor: const Color(0xFFEFF6FF),
-                                onTap: () => _showAddChildDialog(isKlaim: true),
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (_) => const TambahBalitaScreen()),
+                                  );
+                                },
                               ),
                             ),
                             const SizedBox(width: 10),
@@ -1537,7 +1561,12 @@ class _HomeScreenState extends State<HomeScreen> {
           currentIndex: _selectedTabIndex,
           onTap: (index) {
             setState(() => _selectedTabIndex = index);
-            if (index == 4) {
+            if (index == 1) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const AnakSayaScreen()),
+              );
+            } else if (index == 4) {
               _showProfileSheet();
             } else if (index != 0) {
               final titles = ['Beranda', 'Anak Saya', 'Jadwal', 'Riwayat', 'Profil'];
